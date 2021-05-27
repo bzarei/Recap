@@ -12,12 +12,11 @@ public class PersonRepository implements EventSubscription {
 	private String query;
 	private static int MAX_PERSONS = 12;
 	private EventListener listener;
-	private String eventMessage;
 	
 	// constructor
 	public PersonRepository (int size) throws Exception {
 		if (size <= 0 || size > MAX_PERSONS) { 
-			throw new Exception("\nAnzahl der Teilnehmern passt nicht!! muss zwischen 1 und " + MAX_PERSONS + " sein!!!");
+			throw new Exception(String.format("\nAnzahl der Teilnehmern passt nicht!! muss zwischen 1 und %s sein!!!",MAX_PERSONS));
 		}
 	}
 	
@@ -42,11 +41,18 @@ public class PersonRepository implements EventSubscription {
 			listener = null;
 	}
 	
-	public void sendEvent(final String msg) {
+	public void sendEvent(final int id) throws SQLException {
 		if (listener != null) {
 			Event event = new Event();
-			event.setEventMsg(msg); 
-			listener.receiveEvent(event);
+			query = "SELECT message FROM event WHERE id=?"; 
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet result = ps.executeQuery();
+			if (result.next()) {					
+				event.setEventMsg(result.getString(1));
+				event.setEventId(id);
+				listener.receiveEvent(event);
+			}
 		}
 	}
 	
@@ -74,11 +80,9 @@ public class PersonRepository implements EventSubscription {
 		if (p == null) 
 			return false;
 		if (size() >= MAX_PERSONS) {
-			eventMessage = String.format("Maximale Anzahl der Teilnehmer %s ist erreicht. \nEine neue Anmeldung ist nicht mehr möglich", MAX_PERSONS);
-			sendEvent(eventMessage);
+			sendEvent(1);
 			return false;
 		}
-		
 		query = "INSERT INTO personen (ID, ANREDE, VORNAME, NACHNAME, STANDORT) VALUES ( ?, ?, ?, ?, ? )";		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, getNextfreeId());
@@ -93,6 +97,7 @@ public class PersonRepository implements EventSubscription {
 			ex.getSQLState();
 			return false;
 		  }
+		sendEvent(3);
 		return true;
 	}
 	
@@ -218,8 +223,7 @@ public class PersonRepository implements EventSubscription {
 			ex.getLocalizedMessage();
 			return false;
 		  }
-		eventMessage = "Eine Person ist abgemeldet!";
-		sendEvent(eventMessage);
+		sendEvent(2);
 		return true;
 	}
 	
@@ -288,10 +292,9 @@ public class PersonRepository implements EventSubscription {
 	 * @throws SQLException
 	 */
 	private void printRecord(ResultSet result) throws SQLException {	
-		while (result.next()) {
-			System.out.println("|  " + result.getInt(1) + " |      " + result.getByte(2)
-				+ " | " + result.getString(3) + " | " + result.getString(4) 
-				+ " | " + result.getString(5));
+		while (result.next()) {	
+			System.out.println(String.format("|  %s |      %s | %s | %s | %s",result.getInt(1),result.getByte(2),
+			result.getString(3),result.getString(4),result.getString(5)));
 		}		
 	}
 	
@@ -304,8 +307,8 @@ public class PersonRepository implements EventSubscription {
 		try (Statement st = connection.createStatement()) {
 			try (ResultSet result = st.executeQuery(query)) {
 				while (result.next()) {
-					System.out.println("|  " + result.getLong(1) + " |      " + result.getByte(2)
-						+ " | " + result.getString(3) + " | " + result.getString(4));
+					System.out.println(String.format("|  %s |      %s | %s | %s | %s",result.getInt(1),result.getByte(2),
+						result.getString(3),result.getString(4),result.getString(5)));
 				}
 			} catch (SQLException ex) {
 				ex.fillInStackTrace();
