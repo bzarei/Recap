@@ -199,8 +199,8 @@ public class Menu implements Closeable, EventListener {
 		if ((vorname != "") || (nachname != "")) {
 			personRepo.create(person);
 		} else
-			System.out.println("Name und Nachname sind leer. Anmeldung konnte nicht erfolgen!\n"
-					+ "bitte nochmal mit Auswahl '1' versuchen:");
+			System.out.println("Name und Nachname sind leer. Anmeldung konnte nicht erfolgen!"
+					+ "\nbitte nochmal mit Auswahl '1' versuchen:");
 		freeCapacity();
 	}
 
@@ -210,7 +210,7 @@ public class Menu implements Closeable, EventListener {
 		int l = scanner.nextInt();
 		scanner.nextLine();
 		if (!personRepo.delete(l)) {
-			System.out.println("=> Id: " + l + " nicht gefunden!");
+			System.out.println(String.format("=> Id: %s nicht gefunden!",l));
 		}
 	}
 
@@ -247,7 +247,7 @@ public class Menu implements Closeable, EventListener {
 		if (!personRepo.update(person)) {
 			System.out.println("Kein Update möglich: Person nicht gefunden!");
 		} else
-			System.out.println("new: " + vorname + " " + nachname);
+			System.out.println(String.format("new: %s %s",vorname,nachname));
 	}
 
 	// 4. Personenliste zeigen
@@ -263,16 +263,15 @@ public class Menu implements Closeable, EventListener {
 		personRepo.deleteAll();
 	}
 
-	// 6. Anzahl freien Plätze zeigen
+	// 6. Anzahl der Belegte Plätze zeigen
 	private void countPersons() throws SQLException {
-		System.out.println("Aktuelle Anzahl der Teilnehmern: " + personRepo.size());
+		System.out.println(String.format("Aktuelle Anzahl der Teilnehmern: %s",personRepo.size()));
 	}
 
 	// 7. Anzahl der freien Plätze
 	private void freeCapacity() throws SQLException {
 		System.out.println("-----------------------------------------");
-		System.out.println(
-				"Freie Plätze: " + (personRepo.getMaxsize() - personRepo.size()) + " - belegt: " + personRepo.size());
+		System.out.println(String.format("Freie Plätze: %s - belegt: %s",personRepo.getMaxsize()-personRepo.size(),personRepo.size()));	
 	}
 
 	// 8. Suche Personen
@@ -301,10 +300,10 @@ public class Menu implements Closeable, EventListener {
 		int l = scanner.nextInt();
 		scanner.nextLine();
 		if (personRepo.get(l) != null) {
-			System.out.println("Id: " + personRepo.get(l).getId() + " " + personRepo.get(l).getAnrede() + " "
-					+ personRepo.get(l).getVorname() + " " + personRepo.get(l).getNachname());
+			System.out.println(String.format("Id: %s %s %s %s %s",personRepo.get(l).getId(),personRepo.get(l).getAnrede(),
+					personRepo.get(l).getVorname(),personRepo.get(l).getNachname(), personRepo.get(l).getStandort().toString()));
 		} else
-			System.out.println("Person mit Id " + l + " nicht gefunden!");
+			System.out.println(String.format("Person mit Id %s nicht gefunden!",l));
 	}
 
 	// 8.4 Suche Personen nach Standort
@@ -337,7 +336,7 @@ public class Menu implements Closeable, EventListener {
 	
 	private void printTheLine() throws SQLException {
 		System.out.println("---------------------------------------");
-		System.out.println("  Inhalt der Liste mit " + personRepo.size() + " Personen:");
+		System.out.println(String.format("  Inhalt der Liste mit %s Personen:",personRepo.size()));
 		System.out.println("---------------------------------------");
 	}
 	

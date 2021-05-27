@@ -62,5 +62,4 @@ public class Person {
 	public String getNachname() {
 		return nachname;
 	}
-	
 }
