@@ -41,6 +41,21 @@ public class PersonRepository implements EventSubscription {
 			listener = null;
 	}
 	
+	/**
+	 * only in order to practice more about DB, created a table event in 
+	 * db seminar_schema and filled out with 3 following events:
+	 *	--------------------- ------------------------------------+
+	 * | 1 | Maximale Anzahl der Teilnehmer ist bereits erreicht! |
+	 * | 2 | Eine Person ist abgemeldet                           |
+	 * | 3 | Eine Person ist angemeldet                           |
+     * -----------------------------------------------------------+
+     * this method gets specified id and looked for id in table event
+     * furthermore takes it's message and initiated an intance of
+     * class Event with proper id and message and finally sends this
+     * into listener. 
+	 * @param id
+	 * @throws SQLException
+	 */
 	public void sendEvent(final int id) throws SQLException {
 		if (listener != null) {
 			Event event = new Event();
