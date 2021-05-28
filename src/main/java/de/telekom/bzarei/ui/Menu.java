@@ -47,7 +47,6 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	private void showMenu() {
-
 		System.out.println();
 		System.out.println("*****************************************");
 		System.out.println("*   Hauptmenü - bitte Auswahl treffen   *");
@@ -59,19 +58,18 @@ public class Menu implements Closeable, EventListener {
 		System.out.println("*  5. Personenliste löschen             *");
 		System.out.println("*  6. Anzahl der angemeldeten Personen  *");
 		System.out.println("*  7. Anzahl der freien Plätze          *");
-		System.out.println("*  8. Suche Personen                    *");
+		System.out.println("*  8. Search-Menü (Suche Personen)      *");
 		System.out.println("* ------------------------------------- *");
-		System.out.println("*  H. Help                              *");
+		System.out.println("*  H. Help-Menü                         *");
 		System.out.println("*  Q. Programm beenden                  *");
 		System.out.println("*****************************************");
 		System.out.print(">>");
 	}
 
 	private void showSearchMenu() {
-
 		System.out.println();
 		System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
-		System.out.println("|  Submenü Suchen - Auswahl 1,2,3,4   |");
+		System.out.println("|  Search-Menü  -   Auswahl 1,2,3,4   |");
 		System.out.println("| ----------------------------------- |");
 		System.out.println("|   1. Suche nach Vorname             |");
 		System.out.println("|   2. Suche nach Nachname            |");
@@ -316,22 +314,22 @@ public class Menu implements Closeable, EventListener {
 	// Help-Menü
 	private void showHelpMenu() {
 		System.out.println();
-		System.out.println("* -------------------------------------- *");
-		System.out.println("*   Helpmenü -  Standorte und Anrede     *");
-		System.out.println("* -------------------------------------- *");
-		System.out.println("*  Mögliche Standorte: |   Abkurzung:    *");
-		System.out.println("*  -------             |   -----------   *");
-		System.out.println("*  Bonn                |   b/bn/bo       *");
-		System.out.println("*  Berlin              |   br/be         *");
-		System.out.println("*  Köln/Koeln          |   kn/kln        *");
-		System.out.println("*  Darmstadt           |   d/darm/da/ds  *");
-		System.out.println("*  Magedeburg          |   m/mg/ma/mag   *");
-		System.out.println("*                      |                 *");
-		System.out.println("*  Anrede:             |                 *");
-		System.out.println("*  -------             |   -----------   *");
-		System.out.println("*  Frau                |   f/fr          *");
-		System.out.println("*  Herr                |   h/hr          *");
-		System.out.println("* -------------------------------------- *");
+		System.out.println("* ------------------------------------- *");
+		System.out.println("*  Hilfe bei Standorte und Anrede       *");
+		System.out.println("* ------------------------------------- *");
+		System.out.println("*  Standorte:  | Eingabe-Möglichkeiten  *");
+		System.out.println("*  -------     | ---------------------  *");
+		System.out.println("*  Bonn        |   b/bn/bo              *");
+		System.out.println("*  Berlin      |   br/be                *");
+		System.out.println("*  Köln/Koeln  |   kn/kln               *");
+		System.out.println("*  Darmstadt   |   d/darm/da/ds         *");
+		System.out.println("*  Magedeburg  |   m/mg/ma/mag          *");
+		System.out.println("*              |                        *");
+		System.out.println("*  Anrede:     |                        *");
+		System.out.println("*  -------     | ---------------------  *");
+		System.out.println("*  Frau        |   f/fr                 *");
+		System.out.println("*  Herr        |   h/hr                 *");
+		System.out.println("* ------------------------------------- *");
 	}
 	
 	private void printTheLine() throws SQLException {

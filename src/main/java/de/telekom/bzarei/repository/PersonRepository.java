@@ -13,29 +13,68 @@ public class PersonRepository implements EventSubscription {
 	private static int MAX_PERSONS = 12;
 	private EventListener listener;
 	
-	// constructor
+	/** constructor
+	 * with this constructor it's to be checked directly if input parameter size
+	 * is greater than permitted number in this class with MAX_PERSONS. 
+	 * 
+	 * @param size is maximum number of participants
+	 * @throws Exception
+	 */
 	public PersonRepository (int size) throws Exception {
 		if (size <= 0 || size > MAX_PERSONS) { 
 			throw new Exception(String.format("\nAnzahl der Teilnehmern passt nicht!! muss zwischen 1 und %s sein!!!",MAX_PERSONS));
 		}
 	}
 	
-	// constructor
+	/** constructor
+	 * with this constructor two private variables of this class 
+	 * will be set to the following input parameters:
+	 * 
+	 * @param co is connection informations with data bank 
+	 * @param size is maximum number of participants
+	 */
 	public PersonRepository (Connection co, int size) {
 		connection = co;
 		MAX_PERSONS = size;
 	}
 	
-	// constructor
+	/** constructor
+	 * if the caller of this constructor tries to create an instance
+	 * of this class without any input parameter, maximum number of 
+	 * participants will be set to 12 as MAX_PERSONS per default. 
+	 * 
+	 * @param: nothing 
+	 */
 	public PersonRepository() throws Exception {
 		this(MAX_PERSONS);
 	}
 	
+	// constructor
+	public PersonRepository(final Connection co) {	
+		this.connection = co;
+	}
+	
+	/**
+	 * This method returns MAX_PERSONS: 
+	 * @return delivers permitted maximum number of participants 
+	 */
+	public static int getMaxsize() {
+		return MAX_PERSONS;
+	}
+	
+	/**
+	 * with this method every listener can be a subscriber 
+	 * of this class to receive events a informations
+	 */
 	public void subscribe(final EventListener listener ) {
 		if (listener != null)
 			this.listener = listener;
 	}
 	
+	/**
+	 * with this method will listener end his 
+	 * subscription to this class.
+	 */
 	public void unsubscribe(EventListener listener) {
 		if (listener != null && this.listener == listener)
 			listener = null;
@@ -71,18 +110,10 @@ public class PersonRepository implements EventSubscription {
 		}
 	}
 	
-	// constructor
-	public PersonRepository(final Connection co) {	
-		this.connection = co;
-	}
-	
-	public static int getMaxsize() {
-		return MAX_PERSONS;
-	}
 	
 	/**
 	 * this method is used for adding a new person into table personen.
-	 * if reference address of given person is null nothing to do and
+	 * if reference address of given person is null, then nothing to do and
 	 * the method returns false otherwise inserts person into the table 
 	 * and returns true. 
 	 * Id for each person is calculated from the size(): next free id = size()+1
@@ -90,8 +121,7 @@ public class PersonRepository implements EventSubscription {
 	 * @return
 	 * @throws SQLException
 	 */
-	public boolean create(final Person p) throws SQLException {
-	
+	public boolean create(final Person p) throws SQLException {	
 		if (p == null) 
 			return false;
 		if (size() >= MAX_PERSONS) {
@@ -124,8 +154,7 @@ public class PersonRepository implements EventSubscription {
 	 * @return
 	 * @throws SQLException
 	 */
-	public Person get(int id) throws SQLException {
-		
+	public Person get(int id) throws SQLException {		
 		Person person = new Person();
 		query = "SELECT * FROM personen WHERE id=?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -161,20 +190,17 @@ public class PersonRepository implements EventSubscription {
 	 * @throws SQLException
 	 */
 	public boolean update(final Person p) throws SQLException {
-
 		if (p == null)                       
 			return false;
-		int i = p.getId();
-		if (get(i) == null)   // person doesn't exist in DB
+		if (get(p.getId()) == null)   // person doesn't exist in DB
 			return false;
-		
 		query = "UPDATE personen SET anrede=?, vorname=?, nachname=?, standort=? WHERE id=?"; 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setByte(1, p.getAnrede().toByte());
 			ps.setString(2, p.getVorname());
 			ps.setString(3, p.getNachname());
 			ps.setString(4, p.getStandort().toString());
-			ps.setInt(5, i);
+			ps.setInt(5, p.getId());
 			ps.execute();
 		} catch (SQLException ex) {
 			System.out.println(" Ein Fehler beim UPDATE in DB aufgetretten! ");
@@ -194,13 +220,11 @@ public class PersonRepository implements EventSubscription {
 	 * @return
 	 * @throws SQLException
 	 */
-	public boolean delete(final Person p) throws SQLException {
-		
+	public boolean delete(final Person p) throws SQLException {		
 		if (p == null)                // person points of null 
 			return false;
 		if (get(p.getId()) == null)   // person doesn't exist in DB
-			return false;
-		
+			return false;	
 		query = "DELETE FROM personen WHERE id=?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setLong(1, p.getId());
@@ -223,11 +247,9 @@ public class PersonRepository implements EventSubscription {
 	 * @return
 	 * @throws SQLException
 	 */
-	public boolean delete(final int id) throws SQLException {
-		
+	public boolean delete(final int id) throws SQLException {		
 		if (get(id) == null)   // person doesn't exist in DB
-			return false;
-		
+			return false;		
 		query = "DELETE FROM personen WHERE id=?";	
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setLong(1, id);
@@ -242,11 +264,9 @@ public class PersonRepository implements EventSubscription {
 		return true;
 	}
 	
-	public Person[] getAllPersonsByOrt(final String ort) throws SQLException {	
-		
+	public Person[] getAllPersonsByOrt(final String ort) throws SQLException {		
 		Person[] list = new Person[size()];
-		query = "SELECT * FROM personen WHERE standort like ?";
-		
+		query = "SELECT * FROM personen WHERE standort like ?";	
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, ort + "%");
 			try (ResultSet result = ps.executeQuery()) {
@@ -274,13 +294,13 @@ public class PersonRepository implements EventSubscription {
 	}
 		
 	/**
-	 * At first it will be checked in this method if the table is empty.
-	 * is not so all persons or lines will be deleted from table personen.
-	 * @return
+	 * In this method it will be at first checked if the table is empty.
+	 * is table is not empty all persons or lines will be deleted from the table.
+	 * @return: true if table is not empty and table is deleted
+	 * false if table is empty or deleting was not successfully! 
 	 * @throws SQLException
 	 */
 	public boolean deleteAll() throws SQLException {
-	
 		query = "SELECT COUNT(*) FROM personen";
 		try (Statement ps = connection.createStatement()) { 
 			try (ResultSet result = ps.executeQuery(query)) { 
@@ -450,7 +470,7 @@ public class PersonRepository implements EventSubscription {
 	/**
 	 * this is a private method known only for this Repository to print 
 	 * all array elements of Person list: Person[].
-	 * @param list
+	 * @param a list of class Person Person[]
 	 * @throws SQLException
 	 */
 	private void printList(Person[] list) throws Exception {
