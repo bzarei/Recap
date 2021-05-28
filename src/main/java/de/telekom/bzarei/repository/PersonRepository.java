@@ -10,16 +10,25 @@ public class PersonRepository implements EventSubscription {
 
 	private Connection connection;
 	private String query;
-	private final static int MAX_PERSONS = 12;
-	//ArrayList<EventListener> listener;
+	private static int MAX_PERSONS = 12;
 	private EventListener listener;
-	private String eventMessage;
 	
 	// constructor
 	public PersonRepository (int size) throws Exception {
 		if (size <= 0 || size > MAX_PERSONS) { 
-			throw new Exception("\nAnzahl der Teilnehmern passt nicht!! muss zwischen 1 und " + MAX_PERSONS + " sein!!!");
+			throw new Exception(String.format("\nAnzahl der Teilnehmern passt nicht!! muss zwischen 1 und %s sein!!!",MAX_PERSONS));
 		}
+	}
+	
+	// constructor
+	public PersonRepository (Connection co, int size) {
+		connection = co;
+		MAX_PERSONS = size;
+	}
+	
+	// constructor
+	public PersonRepository() throws Exception {
+		this(MAX_PERSONS);
 	}
 	
 	public void subscribe(final EventListener listener ) {
@@ -32,11 +41,33 @@ public class PersonRepository implements EventSubscription {
 			listener = null;
 	}
 	
-	public void sendEvent(final String msg) {
+	/**
+	 * only in order to practice more about DB, created a table event in 
+	 * db seminar_schema and filled out with 3 following events:
+	 *	--------------------- ------------------------------------+
+	 * | 1 | Maximale Anzahl der Teilnehmer ist bereits erreicht! |
+	 * | 2 | Eine Person ist abgemeldet                           |
+	 * | 3 | Eine Person ist angemeldet                           |
+     * -----------------------------------------------------------+
+     * this method gets specified id and looked for id in table event
+     * furthermore takes it's message and initiated an intance of
+     * class Event with proper id and message and finally sends this
+     * into listener. 
+	 * @param id
+	 * @throws SQLException
+	 */
+	public void sendEvent(final int id) throws SQLException {
 		if (listener != null) {
 			Event event = new Event();
-			event.setEventMsg(msg); 
-			listener.receiveEvent(event);
+			query = "SELECT message FROM event WHERE id=?"; 
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet result = ps.executeQuery();
+			if (result.next()) {					
+				event.setEventMsg(result.getString(1));
+				event.setEventId(id);
+				listener.receiveEvent(event);
+			}
 		}
 	}
 	
@@ -64,11 +95,9 @@ public class PersonRepository implements EventSubscription {
 		if (p == null) 
 			return false;
 		if (size() >= MAX_PERSONS) {
-			eventMessage = "Maximale Anzahl der Teilnehmer " + MAX_PERSONS + " ist erreicht. \nEine neue Anmeldung ist nicht mehr möglich!";
-			sendEvent(eventMessage);
+			sendEvent(1);
 			return false;
 		}
-		
 		query = "INSERT INTO personen (ID, ANREDE, VORNAME, NACHNAME, STANDORT) VALUES ( ?, ?, ?, ?, ? )";		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, getNextfreeId());
@@ -83,6 +112,7 @@ public class PersonRepository implements EventSubscription {
 			ex.getSQLState();
 			return false;
 		  }
+		sendEvent(3);
 		return true;
 	}
 	
@@ -208,8 +238,7 @@ public class PersonRepository implements EventSubscription {
 			ex.getLocalizedMessage();
 			return false;
 		  }
-		eventMessage = "Eine Person ist abgemeldet!";
-		sendEvent(eventMessage);
+		sendEvent(2);
 		return true;
 	}
 	
@@ -244,7 +273,6 @@ public class PersonRepository implements EventSubscription {
 		return list;
 	}
 		
-	
 	/**
 	 * At first it will be checked in this method if the table is empty.
 	 * is not so all persons or lines will be deleted from table personen.
@@ -279,10 +307,9 @@ public class PersonRepository implements EventSubscription {
 	 * @throws SQLException
 	 */
 	private void printRecord(ResultSet result) throws SQLException {	
-		while (result.next()) {
-			System.out.println("|  " + result.getInt(1) + " |      " + result.getByte(2)
-				+ " | " + result.getString(3) + " | " + result.getString(4) 
-				+ " | " + result.getString(5));
+		while (result.next()) {	
+			System.out.println(String.format("|  %s |      %s | %s | %s | %s",result.getInt(1),result.getByte(2),
+			result.getString(3),result.getString(4),result.getString(5)));
 		}		
 	}
 	
@@ -295,8 +322,8 @@ public class PersonRepository implements EventSubscription {
 		try (Statement st = connection.createStatement()) {
 			try (ResultSet result = st.executeQuery(query)) {
 				while (result.next()) {
-					System.out.println("|  " + result.getLong(1) + " |      " + result.getByte(2)
-						+ " | " + result.getString(3) + " | " + result.getString(4));
+					System.out.println(String.format("|  %s |      %s | %s | %s | %s",result.getInt(1),result.getByte(2),
+						result.getString(3),result.getString(4),result.getString(5)));
 				}
 			} catch (SQLException ex) {
 				ex.fillInStackTrace();
@@ -307,8 +334,8 @@ public class PersonRepository implements EventSubscription {
 	}
 	
 	/**
-	 * this method goes through the lines in table and stores in a list of Persons.
-	 * Address of each line will be stored in an element of array list Person[].
+	 * this method goes through all records in data bank and stores every record in a array list of Persons.
+	 * Address of each line will be stored in an element of array list ArrayList<Person>
 	 * finally list of persons will be printed by using method printList().   
 	 * @return
 	 * @throws Exception
@@ -401,16 +428,13 @@ public class PersonRepository implements EventSubscription {
 		return 0;		
 	} 
 	
-	
 	/**
 	 * this method calculates the next free id in the tables personen as following:
-	 * The last id in the list of all persons in the table from column 1 (id)
-	 * will be increased as next free id for a new person.  
+	 * the biggest id will be found and finally increased for next new person.  
 	 * @return int
 	 * @throws SQLException 
 	 */
-	private int getNextfreeId() throws SQLException {
-		
+	private int getNextfreeId() throws SQLException {	
 		int id = 0;
 		query = "SELECT MAX (id) from personen";
 		try (Statement st = connection.createStatement()){
@@ -422,7 +446,6 @@ public class PersonRepository implements EventSubscription {
 		} catch (SQLException ex) {ex.fillInStackTrace(); }
 		return ++id;
 	}
-
 	
 	/**
 	 * this is a private method known only for this Repository to print 
@@ -431,14 +454,11 @@ public class PersonRepository implements EventSubscription {
 	 * @throws SQLException
 	 */
 	private void printList(Person[] list) throws Exception {
-//		System.out.println("---------------------------------------");	
 		if (size() > 0) {
 			for (int i = 0; i < size(); i++) {
 				if (list[i] != null)
-					System.out.println("Id: " + list[i].getId() + " - "
-							+ list[i].getAnrede() + " " + list[i].getVorname()
-							+ " " + list[i].getNachname() 
-							+ " " + list[i].getStandort());
+					System.out.println(String.format("Id: %s - %s %s %s %s",list[i].getId(),list[i].getAnrede(),
+							list[i].getVorname(),list[i].getNachname(),list[i].getStandort()));
 			}
 		}
 		else 
@@ -446,15 +466,12 @@ public class PersonRepository implements EventSubscription {
 			System.out.println();
 	}	
 	
-	private void printList(ArrayList<Person> list) throws Exception {
-//		System.out.println("---------------------------------------");		
+	private void printList(ArrayList<Person> list) throws Exception {		
 		if (list.size() > 0) {
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i) != null)
-					System.out.println("Id: " + list.get(i).getId() + " - "
-							+ list.get(i).getAnrede() + " " + list.get(i).getVorname()
-							+ " " + list.get(i).getNachname() 
-							+ " " + list.get(i).getStandort());
+					System.out.println(String.format("Id: %s - %s %s %s %s",list.get(i).getId(),list.get(i).getAnrede(),
+							list.get(i).getVorname(),list.get(i).getNachname(),list.get(i).getStandort()));
 			}
 		}
 		else 

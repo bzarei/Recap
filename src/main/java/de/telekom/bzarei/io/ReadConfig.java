@@ -27,13 +27,12 @@ public class ReadConfig implements Closeable {
 	}
 
 	public HashMap<String,String> readConfig() throws IOException {
-
 		String str = buffReader.readLine();
 		HashMap<String,String> configList = new HashMap<String, String>();
 		while (str != null) {			
 			String[] result = str.split("=");
 			configList.put(result[0], result[1].trim());
-			str = buffReader.readLine(); // lese nächste Zeile
+			str = buffReader.readLine();  // lese nächste Zeile
 		}
 		return configList;
 	}
