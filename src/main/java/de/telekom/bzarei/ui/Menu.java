@@ -88,8 +88,15 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	/**
-	 * case Evaluierung und Ausführungsaufruf diese Methode bietet Optionen aus
-	 * Hauptmenü für einen Teilnehmer oder Teilnehmerliste
+	 * this method offers handling in user interface via 10 options in main manu.
+	 * user gets an interface as main menu in console with different choices:
+	 * >> administration of a person (create, remove, update)
+	 * >> controlling the list of persons online checking number of persons
+	 *    and free capacity in the list
+	 * >> displaying whole of persons from the list
+	 * >> search a person or more persons (via id, name, last name and  location)
+	 * >> exit from main menu
+	 * >> help for how could user interact with interface.  
 	 * 
 	 * @param eingabe
 	 * @throws Exception
@@ -133,12 +140,10 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	/**
-	 * case Evaluierung und Ausführungsaufruf diese Methode bietet Optionen in
-	 * Sub-Menü für Suche nach einer Person aus der Teilnehmerliste oder suche nach
-	 * alle Personen die eine Suchkriterium entsprechen. Die Suchkriterien sind
-	 * Suchen nach Vorname/Nachname/Teilnehmer-Id. Es werden alle ähnliche Namen
-	 * (Vorname und Nachname) aus der Teilnehmerliste zurückgeliefert.
-	 * 
+	 * this method offers looking for a person or more persons:
+	 * in sub menu "search" you have choices to select search criteria
+	 * by id, name, last name and location. 
+	 *
 	 * @param eingabe
 	 * @throws MyException
 	 * @throws IOException

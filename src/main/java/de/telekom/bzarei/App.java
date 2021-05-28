@@ -17,6 +17,7 @@ public class App {
 	private Connection connection;
 	private PersonRepository personRepo;
 	
+	
 	// constructor
 	private App() {
 	}
@@ -62,9 +63,9 @@ public class App {
 	/**
 	 * in this method it will be tried to do followings step by step:
 	 * 1. create an instance of class Menu
-	 * 2. create connection with data banak
+	 * 2. create connection with data bank
 	 * 3. create an instance of repository with connection as input parameter
-	 * 4. 
+	 * 4. announce of repository instance for Menu via service call setRepository() 
 	 * 5. start subscribing of Menu
 	 * 6. start and keeping handling with UI 
 	 * 7. end of subscribing of Menu
