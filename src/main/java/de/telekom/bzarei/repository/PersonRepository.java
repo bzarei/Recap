@@ -110,7 +110,6 @@ public class PersonRepository implements EventSubscription {
 		}
 	}
 	
-	
 	/**
 	 * this method is used for adding a new person into table personen.
 	 * if reference address of given person is null, then nothing to do and

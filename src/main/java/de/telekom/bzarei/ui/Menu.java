@@ -8,16 +8,23 @@ import de.telekom.bzarei.sst.*;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 public class Menu implements Closeable, EventListener {
 
 	private PersonRepository personRepo;
 	private Scanner scanner = new Scanner(System.in);
+	private Logger log;
 
+	public Menu() {
+		log = Logger.getLogger(this.getClass());
+		log.info("Hier beginnt Logging!");
+	}
+	
 	public void setRepository(PersonRepository repo) {
 		personRepo = repo;
 	}
-
+	
 	@Override
 	public void close() {
 		scanner.close();
@@ -33,6 +40,7 @@ public class Menu implements Closeable, EventListener {
 		do {
 			showMenu();
 			choice = this.inputMenu();
+			log.info("Auswahl " + choice + " gewählt");
 			checkMenu(choice);
 		} while (!choice.toUpperCase().equals("Q"));
 	}

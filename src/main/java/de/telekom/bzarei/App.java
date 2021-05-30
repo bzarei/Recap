@@ -9,15 +9,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Properties;
 
 public class App {
 	
 	private static App theInstance;
 	private Connection connection;
 	private PersonRepository personRepo;
-	
-	
+		
 	// constructor
 	private App() {
 	}
