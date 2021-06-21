@@ -8,16 +8,23 @@ import de.telekom.bzarei.sst.*;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 public class Menu implements Closeable, EventListener {
 
 	private PersonRepository personRepo;
 	private Scanner scanner = new Scanner(System.in);
+	private Logger log;
 
+	public Menu() {
+		log = Logger.getLogger(this.getClass());
+		log.info("Hier beginnt Logging!");
+	}
+	
 	public void setRepository(PersonRepository repo) {
 		personRepo = repo;
 	}
-
+	
 	@Override
 	public void close() {
 		scanner.close();
@@ -33,6 +40,7 @@ public class Menu implements Closeable, EventListener {
 		do {
 			showMenu();
 			choice = this.inputMenu();
+			log.info("Auswahl " + choice + " gewählt");
 			checkMenu(choice);
 		} while (!choice.toUpperCase().equals("Q"));
 	}
@@ -47,7 +55,6 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	private void showMenu() {
-
 		System.out.println();
 		System.out.println("*****************************************");
 		System.out.println("*   Hauptmenü - bitte Auswahl treffen   *");
@@ -59,19 +66,18 @@ public class Menu implements Closeable, EventListener {
 		System.out.println("*  5. Personenliste löschen             *");
 		System.out.println("*  6. Anzahl der angemeldeten Personen  *");
 		System.out.println("*  7. Anzahl der freien Plätze          *");
-		System.out.println("*  8. Suche Personen                    *");
+		System.out.println("*  8. Search-Menü (Suche Personen)      *");
 		System.out.println("* ------------------------------------- *");
-		System.out.println("*  H. Help                              *");
+		System.out.println("*  H. Help-Menü                         *");
 		System.out.println("*  Q. Programm beenden                  *");
 		System.out.println("*****************************************");
 		System.out.print(">>");
 	}
 
 	private void showSearchMenu() {
-
 		System.out.println();
 		System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
-		System.out.println("|  Submenü Suchen - Auswahl 1,2,3,4   |");
+		System.out.println("|  Search-Menü  -   Auswahl 1,2,3,4   |");
 		System.out.println("| ----------------------------------- |");
 		System.out.println("|   1. Suche nach Vorname             |");
 		System.out.println("|   2. Suche nach Nachname            |");
@@ -90,8 +96,15 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	/**
-	 * case Evaluierung und Ausführungsaufruf diese Methode bietet Optionen aus
-	 * Hauptmenü für einen Teilnehmer oder Teilnehmerliste
+	 * this method offers handling in user interface via 10 options in main manu.
+	 * user gets an interface as main menu in console with different choices:
+	 * >> administration of a person (create, remove, update)
+	 * >> controlling the list of persons online checking number of persons
+	 *    and free capacity in the list
+	 * >> displaying whole of persons from the list
+	 * >> search a person or more persons (via id, name, last name and  location)
+	 * >> exit from main menu
+	 * >> help for how could user interact with interface.  
 	 * 
 	 * @param eingabe
 	 * @throws Exception
@@ -135,12 +148,10 @@ public class Menu implements Closeable, EventListener {
 	}
 
 	/**
-	 * case Evaluierung und Ausführungsaufruf diese Methode bietet Optionen in
-	 * Sub-Menü für Suche nach einer Person aus der Teilnehmerliste oder suche nach
-	 * alle Personen die eine Suchkriterium entsprechen. Die Suchkriterien sind
-	 * Suchen nach Vorname/Nachname/Teilnehmer-Id. Es werden alle ähnliche Namen
-	 * (Vorname und Nachname) aus der Teilnehmerliste zurückgeliefert.
-	 * 
+	 * this method offers looking for a person or more persons:
+	 * in sub menu "search" you have choices to select search criteria
+	 * by id, name, last name and location. 
+	 *
 	 * @param eingabe
 	 * @throws MyException
 	 * @throws IOException
@@ -316,22 +327,22 @@ public class Menu implements Closeable, EventListener {
 	// Help-Menü
 	private void showHelpMenu() {
 		System.out.println();
-		System.out.println("* -------------------------------------- *");
-		System.out.println("*   Helpmenü -  Standorte und Anrede     *");
-		System.out.println("* -------------------------------------- *");
-		System.out.println("*  Mögliche Standorte: |   Abkurzung:    *");
-		System.out.println("*  -------             |   -----------   *");
-		System.out.println("*  Bonn                |   b/bn/bo       *");
-		System.out.println("*  Berlin              |   br/be         *");
-		System.out.println("*  Köln/Koeln          |   kn/kln        *");
-		System.out.println("*  Darmstadt           |   d/darm/da/ds  *");
-		System.out.println("*  Magedeburg          |   m/mg/ma/mag   *");
-		System.out.println("*                      |                 *");
-		System.out.println("*  Anrede:             |                 *");
-		System.out.println("*  -------             |   -----------   *");
-		System.out.println("*  Frau                |   f/fr          *");
-		System.out.println("*  Herr                |   h/hr          *");
-		System.out.println("* -------------------------------------- *");
+		System.out.println("* ------------------------------------- *");
+		System.out.println("*  Hilfe bei Standorte und Anrede       *");
+		System.out.println("* ------------------------------------- *");
+		System.out.println("*  Standorte:  | Eingabe-Möglichkeiten  *");
+		System.out.println("*  -------     | ---------------------  *");
+		System.out.println("*  Bonn        |   b/bn/bo              *");
+		System.out.println("*  Berlin      |   br/be                *");
+		System.out.println("*  Köln/Koeln  |   kn/kln               *");
+		System.out.println("*  Darmstadt   |   d/darm/da/ds         *");
+		System.out.println("*  Magedeburg  |   m/mg/ma/mag          *");
+		System.out.println("*              |                        *");
+		System.out.println("*  Anrede:     |                        *");
+		System.out.println("*  -------     | ---------------------  *");
+		System.out.println("*  Frau        |   f/fr                 *");
+		System.out.println("*  Herr        |   h/hr                 *");
+		System.out.println("* ------------------------------------- *");
 	}
 	
 	private void printTheLine() throws SQLException {
